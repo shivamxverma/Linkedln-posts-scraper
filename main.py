@@ -18,24 +18,87 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 DEFAULT_KEYWORDS = [
-    "hiring",
-    "we are hiring",
-    "startup update",
+    "hiring backend developer",
+    "hiring backend engineer",
+    "backend developer opening startup",
+    "backend engineer hiring startup",
     "raised funding",
     "seed round",
     "series a",
-    "recent fundraise",
+    "series b",
+    "funding announcement startup",
 ]
 
 POST_FIELDS = [
     "keyword",
+    "post_type",
     "author",
+    "author_headline",
+    "author_role_type",
     "profile_link",
     "post_text",
     "post_link",
 ]
 
-PROFILE_FIELDS = ["author", "profile_link", "keywords", "post_count"]
+PROFILE_FIELDS = [
+    "author",
+    "author_headline",
+    "author_role_type",
+    "profile_link",
+    "post_types",
+    "keywords",
+    "post_count",
+]
+
+FUNDING_TERMS = {
+    "raised funding",
+    "raised",
+    "funding",
+    "fundraise",
+    "fundraising",
+    "seed round",
+    "pre-seed",
+    "series a",
+    "series b",
+    "series c",
+    "venture capital",
+    "backed by",
+    "investment",
+}
+
+BACKEND_HIRING_TERMS = {
+    "hiring backend",
+    "backend developer",
+    "backend engineer",
+    "python developer",
+    "python engineer",
+    "django developer",
+    "node.js developer",
+    "nodejs developer",
+    "golang developer",
+    "java backend",
+    "software engineer backend",
+}
+
+FOUNDER_ROLE_TERMS = {
+    "founder",
+    "co-founder",
+    "cofounder",
+    "ceo",
+    "cto",
+    "owner",
+    "building",
+}
+
+ENGINEER_ROLE_TERMS = {
+    "engineer",
+    "developer",
+    "engineering",
+    "software",
+    "backend",
+    "full stack",
+    "tech lead",
+}
 
 
 def configure_logging() -> None:
@@ -169,6 +232,29 @@ def clean_text(value: str) -> str:
     return " ".join(value.split())
 
 
+def matches_any_term(text: str, terms: set[str]) -> bool:
+    lowered_text = text.lower()
+    return any(term in lowered_text for term in terms)
+
+
+def classify_post_type(post_text: str, keyword: str) -> str:
+    combined_text = f"{keyword} {post_text}".lower()
+    if matches_any_term(combined_text, BACKEND_HIRING_TERMS):
+        return "backend_hiring"
+    if matches_any_term(combined_text, FUNDING_TERMS):
+        return "funding"
+    return "other"
+
+
+def classify_author_role(author_headline: str, post_text: str) -> str:
+    combined_text = f"{author_headline} {post_text}".lower()
+    if matches_any_term(combined_text, FOUNDER_ROLE_TERMS):
+        return "founder"
+    if matches_any_term(combined_text, ENGINEER_ROLE_TERMS):
+        return "engineer"
+    return "other"
+
+
 def extract_post_link(article) -> str:
     for anchor in article.find_all("a", href=True):
         href = anchor["href"]
@@ -185,6 +271,24 @@ def extract_profile_info(article) -> tuple[str, str]:
             if author:
                 return author, normalize_profile_link(href)
     return "", ""
+
+
+def extract_author_headline(article) -> str:
+    candidate_selectors = [
+        ".update-components-actor__description",
+        ".update-components-actor__sub-description",
+        ".feed-shared-actor__description",
+        ".feed-shared-actor__sub-description",
+    ]
+
+    for selector in candidate_selectors:
+        node = article.select_one(selector)
+        if node:
+            text = clean_text(node.get_text(" ", strip=True))
+            if text:
+                return text
+
+    return ""
 
 
 def extract_post_text(article) -> str:
@@ -213,15 +317,27 @@ def parse_posts(page_source: str, keyword: str) -> list[dict]:
     for article in soup.find_all("div", class_=lambda value: value and "occludable-update" in value):
         post_link = extract_post_link(article)
         author, profile_link = extract_profile_info(article)
+        author_headline = extract_author_headline(article)
         post_text = extract_post_text(article)
+        post_type = classify_post_type(post_text, keyword)
+        author_role_type = classify_author_role(author_headline, post_text)
 
-        if not post_link or not author or not post_text:
+        if (
+            not post_link
+            or not author
+            or not post_text
+            or post_type == "other"
+            or author_role_type == "other"
+        ):
             continue
 
         posts.append(
             {
                 "keyword": keyword,
+                "post_type": post_type,
                 "author": author,
+                "author_headline": author_headline,
+                "author_role_type": author_role_type,
                 "profile_link": profile_link,
                 "post_text": post_text,
                 "post_link": post_link,
@@ -234,15 +350,27 @@ def parse_posts(page_source: str, keyword: str) -> list[dict]:
     for article in soup.find_all("article"):
         post_link = extract_post_link(article)
         author, profile_link = extract_profile_info(article)
+        author_headline = extract_author_headline(article)
         post_text = extract_post_text(article)
+        post_type = classify_post_type(post_text, keyword)
+        author_role_type = classify_author_role(author_headline, post_text)
 
-        if not post_link or not author or not post_text:
+        if (
+            not post_link
+            or not author
+            or not post_text
+            or post_type == "other"
+            or author_role_type == "other"
+        ):
             continue
 
         posts.append(
             {
                 "keyword": keyword,
+                "post_type": post_type,
                 "author": author,
+                "author_headline": author_headline,
+                "author_role_type": author_role_type,
                 "profile_link": profile_link,
                 "post_text": post_text,
                 "post_link": post_link,
@@ -278,13 +406,18 @@ def build_profile_rows(posts: Iterable[dict]) -> list[dict]:
             key,
             {
                 "author": author,
+                "author_headline": post.get("author_headline", "").strip(),
+                "author_role_type": post.get("author_role_type", "").strip(),
                 "profile_link": profile_link,
                 "keywords": set(),
+                "post_types": set(),
                 "post_count": 0,
             },
         )
         if post.get("keyword"):
             row["keywords"].add(post["keyword"])
+        if post.get("post_type"):
+            row["post_types"].add(post["post_type"])
         row["post_count"] += 1
 
     profile_rows = []
@@ -292,7 +425,10 @@ def build_profile_rows(posts: Iterable[dict]) -> list[dict]:
         profile_rows.append(
             {
                 "author": row["author"],
+                "author_headline": row["author_headline"],
+                "author_role_type": row["author_role_type"],
                 "profile_link": row["profile_link"],
+                "post_types": ", ".join(sorted(row["post_types"])),
                 "keywords": ", ".join(sorted(row["keywords"])),
                 "post_count": row["post_count"],
             }
