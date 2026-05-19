@@ -1,5 +1,23 @@
 # LinkedIn Posts And Jobs Scraper
 
+## Run everything
+
+Use the single runner script if you want one command for all scrapers:
+
+```bash
+python3 run_all.py
+```
+
+Examples:
+
+```bash
+python3 run_all.py --only yc --only wellfound
+python3 run_all.py --skip linkedin
+python3 run_all.py --output-dir outputs --ats-limit 25
+```
+
+This writes all CSV files into `outputs/` by default.
+
 ## LinkedIn post scraper
 
 Run:
