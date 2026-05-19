@@ -1,5 +1,6 @@
 import argparse
 import csv
+import json
 import logging
 import re
 import ssl
@@ -156,8 +157,94 @@ def is_entry_level(text: str) -> tuple[bool, str]:
     return False, ""
 
 
+def parse_yc_jobs_from_data_page(soup: BeautifulSoup, source_page: str) -> list[dict]:
+    jobs = []
+    seen_links = set()
+
+    for node in soup.find_all(attrs={"data-page": True}):
+        data_page = node.get("data-page")
+        if not data_page:
+            continue
+
+        try:
+            payload = json.loads(data_page)
+        except json.JSONDecodeError:
+            continue
+
+        props = payload.get("props") or {}
+        job_postings = props.get("jobPostings") or []
+        if not isinstance(job_postings, list):
+            continue
+
+        for posting in job_postings:
+            title = normalize_space(posting.get("title", ""))
+            job_type = normalize_space(posting.get("type", ""))
+            role_track = normalize_space(posting.get("roleSpecificType", ""))
+            location = normalize_space(posting.get("location", ""))
+            experience_text = normalize_space(posting.get("minExperience", ""))
+            min_school_year = normalize_space(posting.get("minSchoolYear", ""))
+
+            company = normalize_space(posting.get("companyName", ""))
+            batch = normalize_space(posting.get("companyBatchName", ""))
+            job_url = posting.get("url", "")
+            if not job_url:
+                continue
+            job_link = (
+                job_url
+                if str(job_url).startswith("http")
+                else f"https://www.ycombinator.com{job_url}"
+            )
+            if job_link in seen_links:
+                continue
+
+            combined_text = normalize_space(
+                " ".join(
+                    [
+                        title,
+                        job_type,
+                        role_track,
+                        location,
+                        experience_text,
+                        min_school_year,
+                    ]
+                )
+            )
+            if not is_relevant_title(title):
+                continue
+            if not is_relevant_job_type(combined_text):
+                continue
+
+            entry_level_ok, reason = is_entry_level(combined_text)
+            if not entry_level_ok and min_school_year.lower() == "any":
+                entry_level_ok, reason = True, "any"
+            if not entry_level_ok:
+                continue
+
+            jobs.append(
+                {
+                    "company": company,
+                    "batch": batch,
+                    "title": title,
+                    "job_type": job_type,
+                    "role_track": role_track,
+                    "location": location,
+                    "experience_text": experience_text or min_school_year,
+                    "entry_level_match_reason": reason,
+                    "job_link": job_link,
+                    "source_page": source_page,
+                }
+            )
+            seen_links.add(job_link)
+
+    return jobs
+
+
 def parse_yc_jobs_page(page_html: str, source_page: str) -> list[dict]:
     soup = BeautifulSoup(page_html, "html.parser")
+    data_page_jobs = parse_yc_jobs_from_data_page(soup, source_page)
+    if data_page_jobs:
+        return data_page_jobs
+
     jobs = []
     seen_links = set()
 
