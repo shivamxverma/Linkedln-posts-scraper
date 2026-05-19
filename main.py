@@ -16,6 +16,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+from env_utils import get_env, load_dotenv
+
 
 DEFAULT_KEYWORDS = [
     "hiring backend developer",
@@ -173,8 +175,27 @@ def build_driver(headless: bool = False, profile_dir: str | None = None) -> webd
 
 
 def wait_for_login(driver: webdriver.Chrome, timeout: int = 180) -> None:
+    linkedin_email = get_env("LINKEDIN_EMAIL")
+    linkedin_password = get_env("LINKEDIN_PASSWORD")
+
     driver.get("https://www.linkedin.com/login")
-    logging.info("Waiting for LinkedIn login. Complete login in the opened browser if needed.")
+    if linkedin_email and linkedin_password:
+        logging.info("Attempting LinkedIn login with credentials from .env.")
+        username_input = WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located((By.ID, "username"))
+        )
+        password_input = WebDriverWait(driver, 30).until(
+            EC.presence_of_element_located((By.ID, "password"))
+        )
+        username_input.clear()
+        username_input.send_keys(linkedin_email)
+        password_input.clear()
+        password_input.send_keys(linkedin_password)
+        driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
+    else:
+        logging.info(
+            "Waiting for LinkedIn login. Complete login in the opened browser if needed."
+        )
 
     try:
         WebDriverWait(driver, timeout).until(
@@ -184,7 +205,8 @@ def wait_for_login(driver: webdriver.Chrome, timeout: int = 180) -> None:
         logging.info("LinkedIn login detected.")
     except TimeoutException:
         raise RuntimeError(
-            "Timed out waiting for LinkedIn login. Log in manually and try again."
+            "Timed out waiting for LinkedIn login. Check LINKEDIN_EMAIL/LINKEDIN_PASSWORD"
+            " in .env or log in manually and try again."
         ) from None
 
 
@@ -546,6 +568,7 @@ def load_keywords(args: argparse.Namespace) -> list[str]:
 
 
 def main() -> None:
+    load_dotenv()
     configure_logging()
     args = parse_args()
     keywords = load_keywords(args)
