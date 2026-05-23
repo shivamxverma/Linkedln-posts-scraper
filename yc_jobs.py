@@ -93,6 +93,9 @@ OUTPUT_FIELDS = [
     "source_page",
 ]
 
+DEFAULT_ALLOWED_LOCATIONS = ["india"]
+REMOTE_TERMS = {"remote", "work from home", "wfh", "anywhere"}
+
 
 def configure_logging() -> None:
     logging.basicConfig(
@@ -330,6 +333,18 @@ def dedupe_jobs(jobs: list[dict]) -> list[dict]:
     return unique_jobs
 
 
+def location_allowed(
+    location: str,
+    context_text: str,
+    allowed_locations: list[str],
+    include_remote: bool,
+) -> bool:
+    haystack = normalize_space(" ".join([location, context_text])).lower()
+    if include_remote and any(term in haystack for term in REMOTE_TERMS):
+        return True
+    return any(location_term in haystack for location_term in allowed_locations)
+
+
 def save_csv(rows: list[dict], output_path: str) -> None:
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -373,6 +388,16 @@ def parse_args() -> argparse.Namespace:
         default="yc_entry_level_jobs.csv",
         help="Output CSV file.",
     )
+    parser.add_argument(
+        "--location",
+        action="append",
+        help="Allowed location keyword. Repeat for multiple (default: india).",
+    )
+    parser.add_argument(
+        "--no-remote",
+        action="store_true",
+        help="Exclude remote jobs.",
+    )
     return parser.parse_args()
 
 
@@ -389,7 +414,30 @@ def main() -> None:
         except (HTTPError, URLError, TimeoutError, ValueError) as exc:
             logging.warning("Failed to fetch YC jobs from %s: %s", url, exc)
 
-    save_csv(dedupe_jobs(all_jobs), args.output)
+    allowed_locations = [
+        normalize_space(value).lower()
+        for value in (args.location or DEFAULT_ALLOWED_LOCATIONS)
+        if normalize_space(value)
+    ]
+    include_remote = not args.no_remote
+    location_filtered = [
+        job
+        for job in dedupe_jobs(all_jobs)
+        if location_allowed(
+            job.get("location", ""),
+            " ".join(
+                [
+                    job.get("title", ""),
+                    job.get("job_type", ""),
+                    job.get("role_track", ""),
+                    job.get("experience_text", ""),
+                ]
+            ),
+            allowed_locations,
+            include_remote,
+        )
+    ]
+    save_csv(location_filtered, args.output)
 
 
 if __name__ == "__main__":

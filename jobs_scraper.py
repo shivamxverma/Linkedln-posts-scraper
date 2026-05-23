@@ -83,6 +83,9 @@ OUTPUT_FIELDS = [
     "job_link",
 ]
 
+DEFAULT_ALLOWED_LOCATIONS = ["india"]
+REMOTE_TERMS = {"remote", "work from home", "wfh", "anywhere"}
+
 
 def configure_logging() -> None:
     logging.basicConfig(
@@ -171,6 +174,18 @@ def filter_job(job: dict) -> dict | None:
     filtered = dict(job)
     filtered["entry_level_match_reason"] = reason
     return filtered
+
+
+def location_allowed(
+    location: str,
+    context_text: str,
+    allowed_locations: list[str],
+    include_remote: bool,
+) -> bool:
+    haystack = normalize_space(" ".join([location, context_text])).lower()
+    if include_remote and any(term in haystack for term in REMOTE_TERMS):
+        return True
+    return any(location_term in haystack for location_term in allowed_locations)
 
 
 def dedupe_jobs(jobs: list[dict]) -> list[dict]:
@@ -362,6 +377,16 @@ def parse_args() -> argparse.Namespace:
         type=int,
         help="Optional max number of filtered jobs to save.",
     )
+    parser.add_argument(
+        "--location",
+        action="append",
+        help="Allowed location keyword. Repeat for multiple (default: india).",
+    )
+    parser.add_argument(
+        "--no-remote",
+        action="store_true",
+        help="Exclude remote jobs.",
+    )
     return parser.parse_args()
 
 
@@ -372,7 +397,30 @@ def main() -> None:
     raw_jobs = collect_jobs(sources)
     enriched_jobs = enrich_jobs(raw_jobs)
     filtered_jobs = [job for job in (filter_job(job) for job in enriched_jobs) if job]
-    unique_jobs = dedupe_jobs(filtered_jobs)
+    allowed_locations = [
+        normalize_space(value).lower()
+        for value in (args.location or DEFAULT_ALLOWED_LOCATIONS)
+        if normalize_space(value)
+    ]
+    include_remote = not args.no_remote
+    location_filtered_jobs = [
+        job
+        for job in filtered_jobs
+        if location_allowed(
+            job.get("location", ""),
+            " ".join(
+                [
+                    job.get("title", ""),
+                    job.get("employment_type", ""),
+                    job.get("experience_summary", ""),
+                    job.get("description", ""),
+                ]
+            ),
+            allowed_locations,
+            include_remote,
+        )
+    ]
+    unique_jobs = dedupe_jobs(location_filtered_jobs)
 
     if args.limit is not None:
         unique_jobs = unique_jobs[: args.limit]

@@ -115,6 +115,9 @@ OUTPUT_FIELDS = [
     "card_text",
 ]
 
+DEFAULT_ALLOWED_LOCATIONS = ["india"]
+REMOTE_TERMS = {"remote", "work from home", "wfh", "anywhere"}
+
 
 def configure_logging() -> None:
     logging.basicConfig(
@@ -391,6 +394,18 @@ def extract_job_from_card(raw_card: dict, source_page: str) -> dict | None:
     }
 
 
+def location_allowed(
+    location: str,
+    context_text: str,
+    allowed_locations: list[str],
+    include_remote: bool,
+) -> bool:
+    haystack = normalize_space(" ".join([location, context_text])).lower()
+    if include_remote and any(term in haystack for term in REMOTE_TERMS):
+        return True
+    return any(location_term in haystack for location_term in allowed_locations)
+
+
 def dedupe_jobs(jobs: list[dict]) -> list[dict]:
     seen = set()
     unique_jobs = []
@@ -492,6 +507,16 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Run Chrome headless.",
     )
+    parser.add_argument(
+        "--location",
+        action="append",
+        help="Allowed location keyword. Repeat for multiple (default: india).",
+    )
+    parser.add_argument(
+        "--no-remote",
+        action="store_true",
+        help="Exclude remote jobs.",
+    )
     return parser.parse_args()
 
 
@@ -505,7 +530,31 @@ def main() -> None:
         headless=args.headless,
         scrolls=args.scrolls,
     )
-    save_csv(jobs, args.output)
+    allowed_locations = [
+        normalize_space(value).lower()
+        for value in (args.location or DEFAULT_ALLOWED_LOCATIONS)
+        if normalize_space(value)
+    ]
+    include_remote = not args.no_remote
+    filtered_jobs = [
+        job
+        for job in jobs
+        if location_allowed(
+            job.get("location", ""),
+            " ".join(
+                [
+                    job.get("title", ""),
+                    job.get("company", ""),
+                    job.get("employment_type", ""),
+                    job.get("experience_text", ""),
+                    job.get("card_text", ""),
+                ]
+            ),
+            allowed_locations,
+            include_remote,
+        )
+    ]
+    save_csv(filtered_jobs, args.output)
 
 
 if __name__ == "__main__":
