@@ -1,0 +1,32 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:connector": "tsx src/connectors/wellfound/test-connector.ts",
+    "save-session": "tsx src/connectors/wellfound/save-session.ts",
+    "import-cookies": "tsx src/connectors/wellfound/import-cookies.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.30.1",
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "cheerio": "^1.2.0",
+    "express": "^5.2.1",
+    "playwright": "^1.60.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.9.1",
+    "prisma": "^6.2.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}
