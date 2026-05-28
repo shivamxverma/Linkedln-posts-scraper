@@ -1,11 +1,18 @@
 import { prisma } from "./prisma.js";
-import { Job as ScrapedJob } from "../connectors/wellfound/types.js";
+export interface StoreJobInput {
+  source: string;
+  title: string;
+  company: string;
+  location?: string;
+  salary?: string;
+  applyUrl: string;
+}
 
 /**
  * Stores a list of standardized scraped jobs in the PostgreSQL database.
  * Performs a safe upsert using 'applyUrl' as the unique key to prevent duplicate listings.
  */
-export async function upsertJobs(jobs: ScrapedJob[]): Promise<{ upserted: number; failed: number }> {
+export async function upsertJobs(jobs: StoreJobInput[]): Promise<{ upserted: number; failed: number }> {
   console.log(`[Job Store] Commencing storage of ${jobs.length} jobs in Neon PostgreSQL...`);
 
   let upserted = 0;
@@ -20,7 +27,7 @@ export async function upsertJobs(jobs: ScrapedJob[]): Promise<{ upserted: number
         update: {
           title: job.title,
           company: job.company,
-          location: job.location,
+          location: job.location ?? "Remote / Multiple Locations",
           salary: job.salary,
           source: job.source,
         },
@@ -28,7 +35,7 @@ export async function upsertJobs(jobs: ScrapedJob[]): Promise<{ upserted: number
           applyUrl: job.applyUrl,
           title: job.title,
           company: job.company,
-          location: job.location,
+          location: job.location ?? "Remote / Multiple Locations",
           salary: job.salary,
           source: job.source,
         },

@@ -7,6 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:connector": "tsx src/connectors/wellfound/test-connector.ts",
+    "test:yc": "tsx src/connectors/yc/test-connector.ts",
     "save-session": "tsx src/connectors/wellfound/save-session.ts",
     "import-cookies": "tsx src/connectors/wellfound/import-cookies.ts"
   },

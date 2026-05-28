@@ -2,6 +2,11 @@ import { RawJob, Job } from "./types.js";
 
 const WELLFOUND_BASE_URL = "https://wellfound.com";
 
+function deriveExternalId(jobUrl: string): string {
+  const match = jobUrl.match(/\/jobs\/([^/?#]+)/);
+  return match?.[1] ?? jobUrl;
+}
+
 /**
  * Normalizes raw scraped job cards into our system's unified schema.
  */
@@ -27,6 +32,7 @@ export function normalizeWellfoundJobs(rawJobs: RawJob[]): Job[] {
 
     return {
       source: "wellfound",
+      externalId: deriveExternalId(raw.jobUrl),
       title: raw.title.trim(),
       company: raw.company.trim(),
       location,

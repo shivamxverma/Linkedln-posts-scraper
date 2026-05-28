@@ -1,3 +1,5 @@
+import type { Job as NormalizedJob } from "../types.js";
+
 export interface SearchConfig {
   role: string;
   location: string;
@@ -12,11 +14,4 @@ export interface RawJob {
   jobUrl: string;
 }
 
-export interface Job {
-  source: string;
-  title: string;
-  company: string;
-  location: string;
-  salary?: string;
-  applyUrl: string;
-}
+export type Job = NormalizedJob;

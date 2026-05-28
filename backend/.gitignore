@@ -135,6 +135,8 @@ session.json
 .yarn/install-state.gz
 .pnp.*
 
+authentication
+
 ### Node Patch ###
 # Serverless Webpack directories
 .webpack/

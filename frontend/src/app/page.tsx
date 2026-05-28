@@ -6,32 +6,29 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const jobs = await listJobs();
   const fetchedAt = new Date().toISOString();
+  const sourceCount = new Set(jobs.map((job) => job.source)).size;
 
   return (
     <main className="page-shell">
-      <section className="hero">
-        <div className="hero__copy">
-          <p className="hero__label">Live job listings</p>
-          <h1>Find the latest roles we&apos;ve scraped into your database.</h1>
-          <p className="hero__description">
-            A clean, fast view of every saved job, designed so you can scan openings and jump to
-            the application in one click.
-          </p>
+      <header className="page-header">
+        <div>
+          <p className="page-kicker">Live job listings</p>
+          <h1>Job board</h1>
+          <p className="page-timestamp">Updated {new Date(fetchedAt).toLocaleString("en-US")}</p>
         </div>
 
-        <div className="hero__stats">
-          <div className="stat-card">
-            <span>Total jobs</span>
+        <div className="page-metrics" aria-label="Job board metrics">
+          <span>
             <strong>{jobs.length}</strong>
-          </div>
-          <div className="stat-card">
-            <span>Sources</span>
-            <strong>{new Set(jobs.map((job) => job.source)).size}</strong>
-          </div>
+            jobs
+          </span>
+          <span>
+            <strong>{sourceCount}</strong>
+            sources
+          </span>
         </div>
-      </section>
+      </header>
 
-      <p className="page-timestamp">Updated {new Date(fetchedAt).toLocaleString("en-US")}</p>
       <JobsBoard jobs={jobs} />
     </main>
   );

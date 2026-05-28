@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "paths": {
       "pg": ["./node_modules/@types/pg"],
       "db-schema": ["../db-schema/dist"]
