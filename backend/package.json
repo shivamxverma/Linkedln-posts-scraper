@@ -11,6 +11,7 @@
     "test:linkedin": "tsx src/connectors/linkedin/test-connector.ts",
     "save-session": "tsx src/connectors/wellfound/save-session.ts",
     "save-session:linkedin": "tsx src/connectors/linkedin/save-session.ts",
+    "import-cookies:linkedin": "tsx src/connectors/linkedin/import-cookies.ts",
     "import-cookies": "tsx src/connectors/wellfound/import-cookies.ts"
   },
   "keywords": [],

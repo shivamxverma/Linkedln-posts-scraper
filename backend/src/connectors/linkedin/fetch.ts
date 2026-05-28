@@ -30,18 +30,62 @@ async function blockHeavyResources(context: BrowserContext): Promise<void> {
   });
 }
 
-async function scrollSearchResults(page: Awaited<ReturnType<BrowserContext["newPage"]>>, scrollCount: number): Promise<void> {
-  for (let index = 0; index < scrollCount; index++) {
-    await page.evaluate(() => {
-      const resultsList =
-        document.querySelector(".jobs-search-results-list") ??
-        document.querySelector(".jobs-search-results__list") ??
-        document.scrollingElement ??
-        document.documentElement;
+function getRandomDelay(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
 
-      resultsList.scrollBy({ top: 900, behavior: "instant" });
-    });
-    await page.waitForTimeout(1200);
+async function scrollSearchResults(page: Awaited<ReturnType<BrowserContext["newPage"]>>, scrollCount: number): Promise<void> {
+  console.log(`[LinkedIn Fetcher] Beginning human-simulated page scanning (${scrollCount} scrolls requested)...`);
+  
+  // Human pause: scan the initial viewport
+  await page.waitForTimeout(getRandomDelay(2000, 4500));
+
+  for (let index = 0; index < scrollCount; index++) {
+    try {
+      // Simulate real mouse movements to random coordinates to mimic user attention/movement
+      const x = getRandomDelay(100, 800);
+      const y = getRandomDelay(200, 600);
+      await page.mouse.move(x, y, { steps: getRandomDelay(5, 12) }).catch(() => undefined);
+
+      // Scroll in 2 to 3 smaller, smooth human-like steps instead of one large instant jump
+      const steps = getRandomDelay(2, 3);
+      for (let s = 0; s < steps; s++) {
+        const scrollAmount = getRandomDelay(200, 380);
+        await page.evaluate((amount) => {
+          const resultsList =
+            document.querySelector(".jobs-search-results-list") ??
+            document.querySelector(".jobs-search-results__list") ??
+            document.scrollingElement ??
+            document.documentElement;
+
+          if (resultsList) {
+            resultsList.scrollBy({ top: amount, behavior: "smooth" });
+          }
+        }, scrollAmount);
+        
+        // Brief realistic pause between mini-scroll steps
+        await page.waitForTimeout(getRandomDelay(600, 1100));
+      }
+    } catch (err: any) {
+      const currentUrl = page.url();
+      if (
+        currentUrl.includes("login") ||
+        currentUrl.includes("checkpoint") ||
+        currentUrl.includes("signup") ||
+        currentUrl.includes("authwall")
+      ) {
+        throw new Error(`[LinkedIn Fetcher] Session is invalid, expired, or blocked. Redirected to: ${currentUrl}`);
+      }
+      if (err.message.includes("Execution context was destroyed") || err.message.includes("navigation")) {
+        console.warn(`[LinkedIn Fetcher] Scrolling interrupted by context destruction, retrying... Current URL: ${currentUrl}`);
+        await page.waitForTimeout(getRandomDelay(2000, 3000));
+        continue;
+      }
+      throw err;
+    }
+    
+    // Deep random pause between listing batches to mimic reading cards
+    await page.waitForTimeout(getRandomDelay(2800, 5200));
   }
 }
 
