@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as fs from "fs";
-import * as path from "path";
 
 export const dynamic = "force-dynamic";
 

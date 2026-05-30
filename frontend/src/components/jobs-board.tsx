@@ -5,6 +5,22 @@ import { useMemo, useState, useEffect } from "react";
 import { JobCard, getStatusStyle } from "@/components/job-card";
 import type { Job } from "@/types/job";
 
+interface ResumeVersion {
+  id: string;
+  pdfPath: string;
+  latexPath: string;
+}
+
+interface Application {
+  id: string;
+  status: string;
+  createdAt: string;
+  jobId: string;
+  errorMessage?: string | null;
+  resumeVersion?: ResumeVersion | null;
+  job: Job;
+}
+
 type JobsBoardProps = {
   jobs: Job[];
 };
@@ -49,7 +65,7 @@ export function JobsBoard({ jobs: initialJobs }: JobsBoardProps) {
 
   // Auto Apply & Job Details Drawer States
   const [selectedJobDetails, setSelectedJobDetails] = useState<Job | null>(null);
-  const [activeApplication, setActiveApplication] = useState<any | null>(null);
+  const [activeApplication, setActiveApplication] = useState<Application | null>(null);
   const [pollingStatus, setPollingStatus] = useState<"IDLE" | "POLLING" | "SUCCESS" | "FAILED">("IDLE");
   const [pollingIntervalId, setPollingIntervalId] = useState<NodeJS.Timeout | null>(null);
 
@@ -63,11 +79,9 @@ export function JobsBoard({ jobs: initialJobs }: JobsBoardProps) {
   }, [pollingIntervalId]);
 
   // Applications Queue States
-  const [applications, setApplications] = useState<any[]>([]);
-  const [isLoadingApps, setIsLoadingApps] = useState(false);
+  const [applications, setApplications] = useState<Application[]>([]);
 
   const fetchApplications = async () => {
-    setIsLoadingApps(true);
     try {
       const res = await fetch("/api/v1/applications");
       const json = await res.json();
@@ -76,8 +90,6 @@ export function JobsBoard({ jobs: initialJobs }: JobsBoardProps) {
       }
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsLoadingApps(false);
     }
   };
 
@@ -1344,11 +1356,11 @@ export function JobsBoard({ jobs: initialJobs }: JobsBoardProps) {
                         <span>{activeApplication?.status !== "QUEUED" ? "✓" : "●"}</span>
                         <span style={{ marginLeft: "6px" }}>Optimize Resume using OpenAI</span>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: ["READY_TO_APPLY", "APPLYING", "APPLIED"].includes(activeApplication?.status) ? 1 : 0.5 }}>
-                        <span>{["READY_TO_APPLY", "APPLYING", "APPLIED"].includes(activeApplication?.status) ? "✓" : "○"}</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: ["READY_TO_APPLY", "APPLYING", "APPLIED"].includes(activeApplication?.status || "") ? 1 : 0.5 }}>
+                        <span>{["READY_TO_APPLY", "APPLYING", "APPLIED"].includes(activeApplication?.status || "") ? "✓" : "○"}</span>
                         <span style={{ marginLeft: "6px" }}>Compile tailored LaTeX & PDF resume</span>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: ["APPLYING", "APPLIED"].includes(activeApplication?.status) ? 1 : 0.5 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", opacity: ["APPLYING", "APPLIED"].includes(activeApplication?.status || "") ? 1 : 0.5 }}>
                         <span>{activeApplication?.status === "APPLIED" ? "✓" : activeApplication?.status === "APPLYING" ? "●" : "○"}</span>
                         <span style={{ marginLeft: "6px" }}>Launch Playwright headed apply flow</span>
                       </div>
