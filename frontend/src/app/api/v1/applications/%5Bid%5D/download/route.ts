@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(
   request: NextRequest,
-  context: any
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const params = await context.params;
@@ -57,7 +57,6 @@ export async function GET(
 
     // 3. Read the file into a buffer
     const fileBuffer = fs.readFileSync(filePath);
-    const fileBasename = path.basename(filePath);
 
     // 4. Set headers based on file type
     const headers = new Headers();
