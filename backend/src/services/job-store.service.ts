@@ -1,4 +1,6 @@
 import { prisma } from "./prisma.js";
+import { isIndiaJob } from "../shared/location-filter.js";
+
 export interface StoreJobInput {
   source: string;
   title: string;
@@ -20,6 +22,11 @@ export async function upsertJobs(jobs: StoreJobInput[]): Promise<{ upserted: num
   let failed = 0;
 
   for (const job of jobs) {
+    if (!isIndiaJob(job.location)) {
+      console.log(`[Job Store] Skipping job listing "${job.title}" at "${job.company}" because location "${job.location}" is not in India.`);
+      continue;
+    }
+
     try {
       const derivedId = job.externalId ?? 
         job.applyUrl.split("/").pop()?.split("?")[0] ?? 

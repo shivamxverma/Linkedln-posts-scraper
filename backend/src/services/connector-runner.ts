@@ -22,6 +22,7 @@ export async function runAllConnectors(): Promise<{ totalFetched: number; upsert
     console.log("[Connector Runner] Launching YC Jobs Connector...");
     const ycJobs = await searchYcJobs({
       query: "Software Engineer",
+      location: "India",
     });
     allJobs.push(...ycJobs);
     console.log(`[Connector Runner] YC Jobs Connector successfully returned ${ycJobs.length} normalized listings.`);
@@ -34,7 +35,7 @@ export async function runAllConnectors(): Promise<{ totalFetched: number; upsert
     console.log("[Connector Runner] Launching Wellfound Jobs Connector...");
     const wellfoundJobs = await searchWellfoundJobs({
       role: "software-engineer",
-      location: "remote",
+      location: "India",
     });
     allJobs.push(...wellfoundJobs);
     console.log(`[Connector Runner] Wellfound Jobs Connector successfully returned ${wellfoundJobs.length} normalized listings.`);
@@ -47,7 +48,7 @@ export async function runAllConnectors(): Promise<{ totalFetched: number; upsert
     console.log("[Connector Runner] Launching LinkedIn Jobs Connector...");
     const linkedinJobs = await searchLinkedinJobs({
       keywords: "Software Engineer",
-      location: "United States",
+      location: "India",
       experienceLevel: "entry",
       workplaceType: "remote",
     });

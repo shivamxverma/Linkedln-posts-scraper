@@ -1,5 +1,6 @@
 import { prisma } from "./prisma.js";
 import type { Job } from "../connectors/types.js";
+import { isIndiaJob } from "../shared/location-filter.js";
 
 /**
  * Ingestion Service
@@ -13,6 +14,11 @@ export async function ingestJobs(jobs: Job[]): Promise<{ upserted: number; faile
   let failed = 0;
 
   for (const job of jobs) {
+    if (!isIndiaJob(job.location)) {
+      console.log(`[Ingestion Service] Skipping job listing "${job.title}" at "${job.company}" because location "${job.location}" is not in India.`);
+      continue;
+    }
+
     try {
       await prisma.job.upsert({
         where: {
