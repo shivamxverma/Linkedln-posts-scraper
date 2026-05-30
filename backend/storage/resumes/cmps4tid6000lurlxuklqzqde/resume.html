@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shivam Kumar Verma - Resume</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #1f2937;
+      line-height: 1.4;
+      padding: 0;
+      background: white;
+      font-size: 10pt;
+    }
+
+    .resume-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 24pt;
+      font-weight: 700;
+      color: #111827;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .contact-info {
+      font-size: 8.5pt;
+      color: #4b5563;
+      margin-top: 4px;
+    }
+
+    .contact-info a {
+      color: #4338ca;
+      text-decoration: none;
+    }
+
+    section {
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: 11pt;
+      font-weight: 600;
+      color: #111827;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid #d1d5db;
+      padding-bottom: 2px;
+      margin-bottom: 6px;
+    }
+
+    .summary-text {
+      font-size: 9pt;
+      color: #374151;
+      text-align: justify;
+    }
+
+    .skill-category {
+      font-size: 9pt;
+      margin-bottom: 3px;
+      color: #374151;
+    }
+
+    .item {
+      margin-bottom: 8px;
+    }
+    .item:last-child {
+      margin-bottom: 0;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 2px;
+    }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 9.5pt;
+      color: #111827;
+    }
+
+    .item-subtitle {
+      font-weight: 400;
+      font-size: 9pt;
+      color: #4b5563;
+      margin-left: 4px;
+    }
+
+    .item-meta {
+      font-size: 8.5pt;
+      color: #6b7280;
+      display: flex;
+      gap: 4px;
+    }
+
+    .tech-tag {
+      font-size: 8pt;
+      font-style: italic;
+      color: #4338ca;
+      margin-left: 6px;
+    }
+
+    .item-bullets {
+      margin-left: 14px;
+      margin-top: 2px;
+    }
+
+    .item-bullets li {
+      font-size: 9pt;
+      color: #374151;
+      margin-bottom: 2px;
+      text-align: justify;
+    }
+
+    @media print {
+      body {
+        margin: 0;
+      }
+      .resume-container {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="resume-container">
+    <header>
+      <h1>Shivam Kumar Verma</h1>
+      <div class="contact-info">
+        <a href="mailto:shivam.verma.dev00@gmail.com">shivam.verma.dev00@gmail.com</a> &bull; <span>+91-9135668614</span> &bull; <a href="Portfolio" target="_blank">Website</a> &bull; <a href="LinkedIn" target="_blank">LinkedIn</a> &bull; <a href="GitHub" target="_blank">GitHub</a>
+      </div>
+    </header>
+
+    <section>
+      <h2>Professional Summary</h2>
+      <p class="summary-text">Highly motivated Software Engineer with a strong foundation in full-stack development, specializing in building and deploying scalable, production-grade software. Proficient in Python, JavaScript (including ReactJS), and C++, with practical experience in backend services, data pipelines, and integrating AI/LLM technologies. Adept at optimizing system performance, designing robust architectures, and ensuring code quality, eager to contribute to advancing large language models and AI-driven coding solutions.</p>
+    </section>
+
+    <section>
+      <h2>Skills</h2>
+      
+      <div class="skill-category">
+        <strong>Programming Languages:</strong> Python, JavaScript, TypeScript, C++
+      </div>
+      <div class="skill-category">
+        <strong>Frameworks & Libraries:</strong> React, Next.js, Node.js, Express.js, FastAPI
+      </div>
+      <div class="skill-category">
+        <strong>Databases & ORMs:</strong> PostgreSQL, Redis, ClickHouse, Prisma, Drizzle
+      </div>
+      <div class="skill-category">
+        <strong>DevOps & Cloud:</strong> Docker, AWS (EC2, S3, Lambda), Nginx, Linux, Git, CI/CD
+      </div>
+      <div class="skill-category">
+        <strong>AI & ML:</strong> LLM integration, Prompt engineering, Semantic search, Pinecone
+      </div>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+      
+      <div class="item">
+        <div class="item-header">
+          <div>
+            <span class="item-title">Software Developer Intern</span>
+            <span class="item-subtitle">at klimb.io</span>
+          </div>
+          <div class="item-meta">
+            <span>Nov 2025 – Current</span>
+            <span>&bull;</span>
+            <span>Nagpur, Maharashtra</span>
+          </div>
+        </div>
+        <ul class="item-bullets">
+          <li>Engineered a credit-based monetization system for 6+ AI features, migrating platform access control from feature flags to PostgreSQL and middleware guards, significantly reducing system complexity by approximately 70%.</li><li>Implemented a global field template architecture by restructuring the database schema, eliminating per-tenant data duplication and ensuring zero-downtime migration with complete data integrity across all customers.</li><li>Optimized recruiter dashboard performance by introducing precomputed, indexed data pipelines, reducing load times from 2-3 seconds to under 500ms.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+      
+      <div class="item">
+        <div class="item-header">
+          <div>
+            <span class="item-title">CodeSM</span>
+            <span class="tech-tag">React, Node.js, Express.js, Redis, BullMQ, Docker, PostgreSQL, AWS EC2</span>
+          </div>
+          <div class="item-meta">
+            <span>Personal Project</span>
+          </div>
+        </div>
+        <ul class="item-bullets">
+          <li>Developed a scalable, asynchronous code execution engine by implementing segregated BullMQ queues and lightweight Redis payload caching, enabling reliable high-throughput submissions with near-zero dropped jobs.</li><li>Eliminated container spin-up overhead by switching to persistent Docker containers with tmpfs mounts, reducing per-test execution time from 300ms to 5ms (approximately 98% faster).</li><li>Hardened job processing with a Dead Letter Queue for retries and a 1-hour Redis cache layer, significantly reducing database load during high-traffic spikes.</li>
+        </ul>
+      </div>
+      <div class="item">
+        <div class="item-header">
+          <div>
+            <span class="item-title">Storix</span>
+            <span class="tech-tag">Next.js, TypeScript, FastAPI, Celery, Redis, PostgreSQL, AWS S3</span>
+          </div>
+          <div class="item-meta">
+            <span>Personal Project</span>
+          </div>
+        </div>
+        <ul class="item-bullets">
+          <li>Engineered an asynchronous PDF processing pipeline with distributed Celery workers and a Redis task queue, enabling non-blocking long-running jobs with no impact on API response times.</li><li>Offloaded file transfer from the server by generating pre-signed S3 URLs for direct client uploads, eliminating backend bottlenecks and improving upload reliability.</li><li>Implemented a Pub/Sub and WebSocket layer to push real-time task updates, providing users with instant feedback from upload through delivery.</li>
+        </ul>
+      </div>
+      <div class="item">
+        <div class="item-header">
+          <div>
+            <span class="item-title">Chatterly</span>
+            <span class="tech-tag">Next.js, Socket.IO, Redis, PostgreSQL, Prisma, NextAuth</span>
+          </div>
+          <div class="item-meta">
+            <span>Personal Project</span>
+          </div>
+        </div>
+        <ul class="item-bullets">
+          <li>Implemented horizontally scalable messaging architecture using Redis Pub/Sub for cross-server event propagation, ensuring consistent room state across distributed instances without sticky sessions.</li><li>Designed zero-drop room event routing by subscribing each server to dedicated Redis channels, guaranteeing message delivery under concurrent multi-user load across distributed instances.</li><li>Secured private rooms by enforcing JWT verification and room-level authorization checks at the Socket.IO middleware layer, preventing unauthorized access.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Education</h2>
+      
+      <div class="item">
+        <div class="item-header">
+          <div>
+            <span class="item-title">B.Tech in Computer Science and Engineering</span>
+            <span class="item-subtitle">from Indian Institute of Information Technology Nagpur</span>
+          </div>
+          <div class="item-meta">
+            <span>Nov 2022 – May 2026</span>
+            <span>&bull;</span>
+            <span>Nagpur, Maharashtra</span>
+          </div>
+        </div>
+        <p class="item-details" style="font-size: 0.85rem; margin-top: 2px; color: #4b5563;">CGPA: 7.5 | Relevant Coursework: Operating Systems, Database Management Systems, Computer Networks, Object-Oriented Programming</p>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

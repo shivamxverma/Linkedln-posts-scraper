@@ -1,0 +1,144 @@
+\documentclass[letterpaper,10pt]{article}
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{geometry}
+
+\geometry{left=0.5in, top=0.4in, right=0.5in, bottom=0.4in}
+
+\pagestyle{fancy}
+\fancyhf{} 
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-6pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-4pt}]
+
+% Custom list environment for experiences and projects
+\newenvironment{resumeList}{
+  \begin{itemize}[leftmargin=0.15in, label={}]
+}{
+  \end{itemize}
+}
+
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2.5pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-6pt}
+}
+
+\newcommand{\resumeProjectHeading}[3]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} \textit{\small(#2)} & #3 \\
+    \end{tabular*}\vspace{-6pt}
+}
+
+\renewcommand{\labelitemii}{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=0.15in]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+  \textbf{\Huge \scshape Shivam Kumar Verma} \\ \vspace{4pt}
+  \small \href{mailto:shivam.verma.dev00@gmail.com}{shivam.verma.dev00@gmail.com} \textbullet{} +91-9135668614 \textbullet{} \href{Portfolio}{Portfolio} \textbullet{} \href{LinkedIn}{LinkedIn} \textbullet{} \href{GitHub}{GitHub}
+\end{center}
+
+%----------SUMMARY----------
+\section{Professional Summary}
+\vspace{3pt}
+\small{Highly motivated Software Engineer with a strong foundation in full-stack development, specializing in building and deploying scalable, production-grade software. Proficient in Python, JavaScript (including ReactJS), and C++, with practical experience in backend services, data pipelines, and integrating AI/LLM technologies. Adept at optimizing system performance, designing robust architectures, and ensuring code quality, eager to contribute to advancing large language models and AI-driven coding solutions.}
+
+%-----------SKILLS-----------
+\section{Skills}
+\begin{itemize}[leftmargin=0.15in, label={}]
+  \small{\item{
+    \textbf{Programming Languages}{: Python, JavaScript, TypeScript, C++} \\ \vspace{2pt}
+    \textbf{Frameworks \& Libraries}{: React, Next.js, Node.js, Express.js, FastAPI} \\ \vspace{2pt}
+    \textbf{Databases \& ORMs}{: PostgreSQL, Redis, ClickHouse, Prisma, Drizzle} \\ \vspace{2pt}
+    \textbf{DevOps \& Cloud}{: Docker, AWS (EC2, S3, Lambda), Nginx, Linux, Git, CI/CD} \\ \vspace{2pt}
+    \textbf{AI \& ML}{: LLM integration, Prompt engineering, Semantic search, Pinecone}
+  }}
+\end{itemize}
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+\begin{resumeList}
+    \resumeSubheading
+    {klimb.io}{Nagpur, Maharashtra}
+    {Software Developer Intern}{Nov 2025 – Current}
+  \resumeItemListStart
+    \resumeItem{Engineered a credit-based monetization system for 6+ AI features, migrating platform access control from feature flags to PostgreSQL and middleware guards, significantly reducing system complexity by approximately 70\%.}
+    \resumeItem{Implemented a global field template architecture by restructuring the database schema, eliminating per-tenant data duplication and ensuring zero-downtime migration with complete data integrity across all customers.}
+    \resumeItem{Optimized recruiter dashboard performance by introducing precomputed, indexed data pipelines, reducing load times from 2-3 seconds to under 500ms.}
+  \resumeItemListEnd
+\end{resumeList}
+
+%-----------PROJECTS-----------
+\section{Projects}
+\begin{resumeList}
+    \resumeProjectHeading
+    {CodeSM}{React, Node.js, Express.js, Redis, BullMQ, Docker, PostgreSQL, AWS EC2}{Personal Project}
+  \resumeItemListStart
+    \resumeItem{Developed a scalable, asynchronous code execution engine by implementing segregated BullMQ queues and lightweight Redis payload caching, enabling reliable high-throughput submissions with near-zero dropped jobs.}
+    \resumeItem{Eliminated container spin-up overhead by switching to persistent Docker containers with tmpfs mounts, reducing per-test execution time from 300ms to 5ms (approximately 98\% faster).}
+    \resumeItem{Hardened job processing with a Dead Letter Queue for retries and a 1-hour Redis cache layer, significantly reducing database load during high-traffic spikes.}
+  \resumeItemListEnd
+
+  \resumeProjectHeading
+    {Storix}{Next.js, TypeScript, FastAPI, Celery, Redis, PostgreSQL, AWS S3}{Personal Project}
+  \resumeItemListStart
+    \resumeItem{Engineered an asynchronous PDF processing pipeline with distributed Celery workers and a Redis task queue, enabling non-blocking long-running jobs with no impact on API response times.}
+    \resumeItem{Offloaded file transfer from the server by generating pre-signed S3 URLs for direct client uploads, eliminating backend bottlenecks and improving upload reliability.}
+    \resumeItem{Implemented a Pub/Sub and WebSocket layer to push real-time task updates, providing users with instant feedback from upload through delivery.}
+  \resumeItemListEnd
+
+  \resumeProjectHeading
+    {Chatterly}{Next.js, Socket.IO, Redis, PostgreSQL, Prisma, NextAuth}{Personal Project}
+  \resumeItemListStart
+    \resumeItem{Implemented horizontally scalable messaging architecture using Redis Pub/Sub for cross-server event propagation, ensuring consistent room state across distributed instances without sticky sessions.}
+    \resumeItem{Designed zero-drop room event routing by subscribing each server to dedicated Redis channels, guaranteeing message delivery under concurrent multi-user load across distributed instances.}
+    \resumeItem{Secured private rooms by enforcing JWT verification and room-level authorization checks at the Socket.IO middleware layer, preventing unauthorized access.}
+  \resumeItemListEnd
+\end{resumeList}
+
+%-----------EDUCATION-----------
+\section{Education}
+\begin{resumeList}
+    \resumeSubheading
+    {Indian Institute of Information Technology Nagpur}{Nagpur, Maharashtra}
+    {B.Tech in Computer Science and Engineering}{Nov 2022 – May 2026}
+    \vspace{2pt}\\
+    \small{CGPA: 7.5 | Relevant Coursework: Operating Systems, Database Management Systems, Computer Networks, Object-Oriented Programming}
+\end{resumeList}
+
+\end{document}

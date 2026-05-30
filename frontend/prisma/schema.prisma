@@ -16,6 +16,7 @@ model Job {
   location   String
   salary     String?
   applyUrl   String?   @map("apply_url")
+  description String?
   createdAt  DateTime  @default(now()) @map("created_at")
   updatedAt  DateTime  @updatedAt @map("updated_at")
   lastSeenAt DateTime  @default(now()) @map("last_seen_at")
@@ -26,8 +27,48 @@ model Job {
   notes      String?
   appliedAt  DateTime? @map("applied_at")
 
+  // Relations for Auto Apply System
+  applications Application[]
+  resumes      ResumeVersion[]
+
   @@unique([source, externalId])
   @@index([source])
   @@index([company])
   @@index([status])
+}
+
+model Application {
+  id               String         @id @default(cuid())
+  jobId            String         @map("job_id")
+  userId           String         @map("user_id") @default("default-user")
+  status           String         // QUEUED, GENERATING_RESUME, READY_TO_APPLY, APPLYING, APPLIED, FAILED
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  appliedAt        DateTime?      @map("applied_at")
+  errorMessage     String?        @map("error_message")
+  resumeVersionId  String?        @map("resume_version_id")
+
+  job              Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  resumeVersion    ResumeVersion? @relation("AppToResume", fields: [resumeVersionId], references: [id])
+  resumeVersions   ResumeVersion[] @relation("JobAppResumes")
+
+  @@index([jobId])
+  @@index([userId])
+  @@index([status])
+}
+
+model ResumeVersion {
+  id            String       @id @default(cuid())
+  applicationId String       @map("application_id")
+  jobId         String       @map("job_id")
+  pdfPath       String       @map("pdf_path")
+  latexPath     String       @map("latex_path")
+  generatedAt   DateTime     @default(now()) @map("generated_at")
+
+  job           Job          @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  application   Application  @relation("JobAppResumes", fields: [applicationId], references: [id], onDelete: Cascade)
+  applications  Application[] @relation("AppToResume")
+
+  @@index([applicationId])
+  @@index([jobId])
 }

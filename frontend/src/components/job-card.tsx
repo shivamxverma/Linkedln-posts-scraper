@@ -3,6 +3,7 @@ import type { Job } from "@/types/job";
 type JobCardProps = {
   job: Job;
   onTrack?: (job: Job) => void;
+  onSelect?: (job: Job) => void;
 };
 
 export function getStatusStyle(status: string) {
@@ -30,9 +31,13 @@ function formatPostedDate(value: string) {
   }).format(new Date(value));
 }
 
-export function JobCard({ job, onTrack }: JobCardProps) {
+export function JobCard({ job, onTrack, onSelect }: JobCardProps) {
   return (
-    <article className="job-card">
+    <article 
+      className="job-card"
+      onClick={() => onSelect?.(job)}
+      style={{ cursor: "pointer", transition: "transform 150ms ease, box-shadow 150ms ease" }}
+    >
       <div className="job-card__eyebrow">
         <span className="source-label">{job.source}</span>
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
@@ -72,7 +77,7 @@ export function JobCard({ job, onTrack }: JobCardProps) {
         </div>
       </div>
 
-      <div className="job-card__footer">
+      <div className="job-card__footer" onClick={(e) => e.stopPropagation()}>
         {job.applyUrl ? (
           <a href={job.applyUrl} target="_blank" rel="noreferrer">
             Apply now
@@ -82,7 +87,10 @@ export function JobCard({ job, onTrack }: JobCardProps) {
         )}
 
         <button
-          onClick={() => onTrack?.(job)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onTrack?.(job);
+          }}
           className="track-button"
           style={{
             display: "inline-flex",

@@ -2,6 +2,8 @@ import express from "express";
 import { prisma } from "./services/prisma.js";
 import { startFetchScheduler, triggerFetchJob } from "./scheduler/fetch.scheduler.js";
 import { startCleanupScheduler, triggerCleanupJob } from "./scheduler/cleanup.scheduler.js";
+import { resumeWorker } from "./queues/resume.worker.js";
+import { applyWorker } from "./queues/apply.worker.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -92,6 +94,9 @@ async function bootstrap() {
     app.listen(PORT, () => {
       console.log(`[Express Health Server] Listening and active on port ${PORT}`);
       console.log(`[Express Health Server] Endpoint check: http://localhost:${PORT}/health`);
+      console.log(`[Express Health Server] Initializing background workers...`);
+      console.log(`[Express Health Server] Resume Worker active: ${resumeWorker.name}`);
+      console.log(`[Express Health Server] Apply Worker active: ${applyWorker.name}`);
     });
 
     // Start fetching scheduler (Runs immediately on boot, then every 3 hours)

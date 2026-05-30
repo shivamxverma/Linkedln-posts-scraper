@@ -6,6 +6,7 @@ export type Job = {
   location: string;
   salary: string | null;
   applyUrl: string | null;
+  description?: string | null;
   createdAt: string;
   updatedAt: string;
   status?: string | null;
