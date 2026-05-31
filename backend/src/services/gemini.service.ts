@@ -133,20 +133,21 @@ ${resumeData.text}`;
     const resumeData = await this.resumeFetcher.fetchMasterResume();
     const { skills, projects } = await this.ensureSkillsAndProjects();
 
-    const systemPrompt = `You are an elite talent representative and cold outreach copywriting expert.
+    const systemPrompt = `You are a cold outreach and copywriting expert.
 Your goal is to write a highly compelling, professional, personalized cold email to a recruiter at a company.
-Your email must grab the recruiter's attention, clearly connect the candidate's unique background to the role requirements, and propose a concise call to action.
+The email MUST be written in the FIRST PERSON perspective ("I", "my", "me") directly from the candidate Shivam Kumar Verma himself.
 
 STRICT CONSTRAINTS (VIOLATIONS ARE UNACCEPTABLE):
-1. Write a professional, high-converting cold email.
+1. Write in the FIRST PERSON as Shivam Kumar Verma. Never write in the third person or say you are writing "on behalf of Shivam". Say "I am a B.Tech CSE student...", "My profile...", "I am eager...".
 2. Ground all experience, achievements, and technical credentials strictly in the candidate's Resume, Skills, and Projects. Do NOT hallucinate achievements, degrees, or certifications.
 3. Keep the email copy concise, engaging, and clear (around 150-200 words). Avoid long paragraphs. Use spacing.
-4. The output MUST be a valid JSON object with EXACTLY two fields:
+4. Sign off the email from "Shivam Kumar Verma".
+5. The output MUST be a valid JSON object with EXACTLY two fields:
 {
   "subject": "...",
   "body": "..."
 }
-5. Do NOT output any markdown tags outside of the JSON object itself. Ensure it is pure parseable JSON.`;
+6. Do NOT output any markdown tags outside of the JSON object itself. Ensure it is pure parseable JSON.`;
 
     const userPrompt = `=== CANDIDATE OUTREACH CONTEXT ===
 
@@ -195,20 +196,22 @@ ${jobDescription}`;
   ): Promise<GeneratedEmail> {
     const resumeData = await this.resumeFetcher.fetchMasterResume();
 
-    const systemPrompt = `You are a professional outreach specialist.
-Write a concise, professional follow-up email to a recruiter regarding the job application at ${companyName}.
-Your tone should be professional, polite, and confident.
+    const systemPrompt = `You are a cold outreach and copywriting expert.
+Write a concise, professional follow-up email to a recruiter regarding a job application at ${companyName}.
+The email MUST be written in the FIRST PERSON perspective ("I", "my", "me") directly from the candidate Shivam Kumar Verma himself.
 
 STRICT CONSTRAINTS & RULES (VIOLATIONS ARE UNACCEPTABLE):
-1. Keep it extremely concise and direct. The maximum length is 80 to 120 words.
-2. Do NOT repeat the exact content or sentences of the initial email or previous follow-up emails.
-3. Check in politely and, if possible, mention additional value or briefly highlight a project/skill that matches the job description.
-4. Output ONLY a valid JSON object with EXACTLY two fields:
+1. Write in the FIRST PERSON as Shivam Kumar Verma. Never write in the third person or say you are writing "on behalf of Shivam".
+2. Keep it extremely concise and direct. The maximum length is 80 to 120 words.
+3. Do NOT repeat the exact content or sentences of the initial email or previous follow-up emails.
+4. Check in politely and, if possible, mention additional value or briefly highlight a project/skill that matches the job description.
+5. Sign off the email from "Shivam Kumar Verma".
+6. Output ONLY a valid JSON object with EXACTLY two fields:
 {
   "subject": "...",
   "body": "..."
 }
-5. Do NOT include markdown styling or text around the JSON object.`;
+7. Do NOT include markdown styling or text around the JSON object.`;
 
     const userPrompt = `=== CANDIDATE CONTEXT ===
 Resume:
