@@ -1,0 +1,7 @@
+Here's the candidate's technical skills profile:
+
+*   **Languages:** TypeScript, JavaScript, Python, C++
+*   **Frameworks & Libraries:** Node.js, Express.js, Next.js, React, FastAPI, BullMQ, Celery, Socket.IO, NextAuth
+*   **Databases & ORMs:** PostgreSQL, Redis, ClickHouse, Prisma, Drizzle
+*   **Cloud & DevOps:** AWS (EC2, S3, Lambda), Docker, Nginx, Linux, Git, CI/CD
+*   **AI/ML:** LLM integration, Prompt engineering, Semantic search, Pinecone

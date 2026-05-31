@@ -242,4 +242,56 @@ ${previousFollowUps.length > 0 ? previousFollowUps.map((e, i) => `[Follow-up ${i
 
     return this.parseJsonResponse<GeneratedEmail>(rawResponse);
   }
+
+  /**
+   * Extracts lead details (company name, recruiter email, and job description) from an uploaded image of a job posting.
+   * @param base64Image The base64-encoded string of the image
+   * @param mimeType The MIME type of the image (e.g. image/png, image/jpeg)
+   */
+  async extractLeadFromImage(
+    base64Image: string,
+    mimeType: string
+  ): Promise<{ companyName: string; recipientEmail: string; jobDescription: string }> {
+    const systemPrompt = `You are an expert recruitment assistant.
+Analyze the provided image of a job posting, recruitment flyer, or LinkedIn screenshot.
+Extract the target lead details as accurately as possible.
+
+STRICT RULES:
+1. Extract the "companyName" (e.g. Google, Stripe, etc. - default to "" if absolutely not mentioned).
+2. Extract the "recipientEmail" (e.g. recruit@company.com - default to "" if not mentioned, do NOT hallucinate).
+3. Extract the full "jobDescription" or requirements (include all visible details of the job role and responsibilities).
+4. Output MUST be a valid JSON object with EXACTLY three fields:
+{
+  "companyName": "...",
+  "recipientEmail": "...",
+  "jobDescription": "..."
+}
+5. Do NOT include any markdown or text around the JSON object.`;
+
+    const rawResponse = await this.safeCall(async () => {
+      const response = await this.openai!.chat.completions.create({
+        model: "gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          {
+            role: "user",
+            content: [
+              { type: "text", text: "Please extract the recruiter lead details from this image." },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:${mimeType};base64,${base64Image}`,
+                },
+              },
+            ],
+          },
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.1,
+      });
+      return response.choices[0]?.message?.content || "";
+    });
+
+    return this.parseJsonResponse<{ companyName: string; recipientEmail: string; jobDescription: string }>(rawResponse);
+  }
 }

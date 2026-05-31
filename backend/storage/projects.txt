@@ -1,0 +1,27 @@
+Here are the major technical projects extracted from the candidate's resume:
+
+---
+
+### **1. CodeSM**
+
+*   **Technologies Utilized:** React, Node.js, Express.js, Redis, BullMQ, Docker, PostgreSQL, AWS EC2
+*   **Key Features/Achievements:**
+    *   **Scalable RCE Engine:** Built an async code execution engine by implementing segregated BullMQ queues and lightweight Redis payload caching, enabling reliable high-throughput submissions with near-zero dropped jobs.
+    *   **Persistent Container Strategy:** Eliminated container spin-up overhead by switching to persistent Docker containers with tmpfs mounts, reducing per-test execution time from 300ms to 5ms (∼98% faster).
+    *   **Fault-Tolerant Worker Architecture:** Hardened job processing by adding a Dead Letter Queue for retries and a 1-hour Redis cache layer, significantly reducing DB load during high-traffic spikes.
+
+### **2. Storix**
+
+*   **Technologies Utilized:** Next.js, TypeScript, FastAPI, Celery, Redis, PostgreSQL, AWS S3
+*   **Key Features/Achievements:**
+    *   **Async PDF Pipeline:** Decoupled PDF ingestion from processing by introducing distributed Celery workers and a Redis task queue, enabling non-blocking long-running jobs with no impact on API response times.
+    *   **Direct Cloud Uploads:** Offloaded file transfer from the server by generating pre-signed S3 URLs for direct client uploads, eliminating backend bottlenecks and improving upload reliability.
+    *   **Real-Time Job Status via WebSockets:** Replaced polling with a Pub/Sub and WebSocket layer to push live task updates, giving users instant feedback from upload through delivery.
+
+### **3. Chatterly**
+
+*   **Technologies Utilized:** Next.js, Socket.IO, Redis, PostgreSQL, Prisma, NextAuth
+*   **Key Features/Achievements:**
+    *   **Horizontally Scalable Messaging:** Enabled multi-instance chat by wiring Redis Pub/Sub for cross-server event propagation, ensuring consistent room state across all nodes without sticky sessions.
+    *   **Zero-Drop Room Event Routing:** Isolated room traffic by subscribing each server to dedicated Redis channels, guaranteeing zero message drops under concurrent multi-user load across distributed instances.
+    *   **JWT Auth & Room Authorization:** Protected private rooms by enforcing JWT verification and room-level checks at the Socket.IO middleware layer, fully preventing unauthorized access.

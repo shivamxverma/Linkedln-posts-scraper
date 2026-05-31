@@ -30,9 +30,14 @@ export function OutreachBoard() {
 
   // Modal State
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addMode, setAddMode] = useState<"single" | "bulk">("single");
+  const [addMode, setAddMode] = useState<"single" | "bulk" | "image">("single");
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [editingMessage, setEditingMessage] = useState<Message | null>(null);
+
+  // Image Upload Form
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [extractingImage, setExtractingImage] = useState(false);
 
   // Single Lead Input Form
   const [companyName, setCompanyName] = useState("");
@@ -215,6 +220,59 @@ export function OutreachBoard() {
       alert("Error uploading bulk leads.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle image selection
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Submit image to Gemini backend for parsing
+  const handleExtractFromImage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!imagePreview || !imageFile) {
+      alert("Please select an image first.");
+      return;
+    }
+
+    setExtractingImage(true);
+    try {
+      const res = await fetch(`${API_BASE}/outreach/leads/extract-image`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image: imagePreview,
+          mimeType: imageFile.type,
+        }),
+      });
+
+      const json = await res.json();
+      if (json.success && json.data) {
+        const { companyName, recipientEmail, jobDescription } = json.data;
+        setCompanyName(companyName || "");
+        setRecipientEmail(recipientEmail || "");
+        setJobDescription(jobDescription || "");
+        setAddMode("single"); // Switch back to the single recruiter form pre-filled!
+        setImageFile(null);
+        setImagePreview(null);
+      } else {
+        alert("Failed to extract: " + json.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error extracting lead details from image.");
+    } finally {
+      setExtractingImage(false);
     }
   };
 
@@ -767,10 +825,25 @@ export function OutreachBoard() {
               >
                 Bulk Copy/Paste
               </button>
+              <button
+                onClick={() => setAddMode("image")}
+                style={{
+                  flex: 1,
+                  padding: "0.75rem",
+                  border: "none",
+                  background: addMode === "image" ? "rgba(49, 37, 24, 0.04)" : "transparent",
+                  fontWeight: addMode === "image" ? 600 : 400,
+                  color: addMode === "image" ? "var(--accent)" : "var(--muted)",
+                  borderBottom: addMode === "image" ? "2px solid var(--accent)" : "none",
+                  cursor: "pointer",
+                }}
+              >
+                📸 Add via Image/Screenshot
+              </button>
             </div>
 
             <div className="glass-modal-body" style={{ padding: "1.5rem" }}>
-              {addMode === "single" ? (
+              {addMode === "single" && (
                 <form onSubmit={handleAddSingleLead} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--muted)", marginBottom: "4px" }}>
@@ -864,7 +937,8 @@ export function OutreachBoard() {
                     </button>
                   </div>
                 </form>
-              ) : (
+              )}
+              {addMode === "bulk" && (
                 <form onSubmit={handleAddBulkLeads} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                   <div>
                     <label style={{ display: "block", fontSize: "0.85rem", fontWeight: 600, color: "var(--muted)", marginBottom: "8px" }}>
@@ -946,6 +1020,99 @@ export function OutreachBoard() {
                       }}
                     >
                       Parse & Bulk Add
+                    </button>
+                  </div>
+                </form>
+              )}
+              {addMode === "image" && (
+                <form onSubmit={handleExtractFromImage} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+                  <div
+                    style={{
+                      border: "2px dashed var(--border)",
+                      borderRadius: "12px",
+                      padding: "2rem",
+                      textAlign: "center",
+                      background: "rgba(0,0,0,0.01)",
+                      cursor: "pointer",
+                      position: "relative",
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        opacity: 0,
+                        cursor: "pointer"
+                      }}
+                    />
+                    <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📸</div>
+                    <p style={{ fontWeight: 500, margin: "0 0 4px 0", color: "var(--text)" }}>
+                      {imageFile ? imageFile.name : "Click or drag an image here to upload"}
+                    </p>
+                    <p style={{ fontSize: "0.8rem", color: "var(--muted)", margin: 0 }}>
+                      Supports PNG, JPG, or screenshots of job listings
+                    </p>
+                  </div>
+
+                  {imagePreview && (
+                    <div style={{ textAlign: "center", margin: "0.5rem 0" }}>
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        style={{
+                          maxWidth: "100%",
+                          maxHeight: "180px",
+                          borderRadius: "8px",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                          objectFit: "contain"
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end", marginTop: "1rem" }}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                        setShowAddModal(false);
+                      }}
+                      style={{
+                        padding: "0.5rem 1rem",
+                        border: "1px solid var(--border)",
+                        borderRadius: "8px",
+                        background: "transparent",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={extractingImage || !imagePreview}
+                      style={{
+                        padding: "0.5rem 1.25rem",
+                        background: "#4f46e5",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        fontWeight: 600,
+                        opacity: extractingImage || !imagePreview ? 0.6 : 1,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.5rem"
+                      }}
+                    >
+                      {extractingImage ? "✨ AI Extracting..." : "✨ Extract Lead with Gemini"}
                     </button>
                   </div>
                 </form>

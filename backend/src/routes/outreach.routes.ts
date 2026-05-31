@@ -69,6 +69,39 @@ outreachRouter.post("/outreach/leads", async (req: Request, res: Response): Prom
 });
 
 /**
+ * 1.5 Extract Lead details from Image
+ * POST /outreach/leads/extract-image
+ */
+outreachRouter.post("/outreach/leads/extract-image", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { image, mimeType } = req.body;
+
+    if (!image || !mimeType) {
+      res.status(400).json({ success: false, message: "Missing base64 image or mimeType." });
+      return;
+    }
+
+    // Clean base64 string if it contains prefix data:image/...;base64,
+    let base64Data = image;
+    if (image.includes("base64,")) {
+      base64Data = image.split("base64,")[1];
+    }
+
+    console.log("[Outreach Router] Calling Gemini to extract lead details from image...");
+    const extracted = await geminiService.extractLeadFromImage(base64Data, mimeType);
+
+    res.status(200).json({
+      success: true,
+      message: "Successfully extracted lead details from image.",
+      data: extracted,
+    });
+  } catch (error) {
+    console.error("[Outreach Router] Error extracting lead from image:", error);
+    res.status(500).json({ success: false, error: String(error) });
+  }
+});
+
+/**
  * 2. Get All Leads with Message History
  * GET /outreach/leads
  */
